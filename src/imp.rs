@@ -51,6 +51,23 @@ impl IDm {
         }
     }
 
+    pub fn dump_card(&mut self, card: pcsc::Card) {
+        let mut cmd_dump: Vec<u8> = vec![0x06];
+
+        let vidm = if let Ok(i) = &self.idm {
+            i
+        } else {
+            eprintln!("idmがありません");
+            std::process::exit(1);
+        };
+        cmd_dump.append(&mut vidm.clone());
+
+        let vec_endcode = vec![0x01, 0xCB, 0x09, 0x01, 0x00];
+        cmd_dump.append(&mut vec_endcode.clone());
+
+        // select file apdu commandから
+    }
+
     // IDmを個別で返す
     pub fn resp_idm(&self) -> Result<Vec<u8>, pcsc::Error> {
         self.idm.clone()
