@@ -45,7 +45,7 @@ impl IDm {
             }
             Err(err) => {
                 eprintln!("APDUコマンドの送信（IDm読み取り）に失敗: {}", err);
-                self.idm = Err(pcsc::Error::CommError); // 適当にエラーを返す(通信エラー)
+                self.idm = Err(pcsc::Error::CommError); // 適当にエラーを返す2(通信エラー)
                 return;
             }
         }

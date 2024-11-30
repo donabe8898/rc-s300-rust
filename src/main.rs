@@ -101,31 +101,6 @@ fn main() {
     };
 
     // カードからIDmを吸い出す
-    // let idm_cmd = hex!("FF CA 00 00");
-    // let mut buf = [0; MAX_BUFFER_SIZE];
-    // let res_apdu = match card.transmit(&idm_cmd, &mut buf) {
-    //     Ok(res) => res,
-    //     Err(err) => {
-    //         eprintln!("APDUコマンドの送信（IDm読み取り）に失敗: {}", err);
-    //         std::process::exit(1);
-    //     }
-    // };
-
-    // // IDm読み出し時、成功と失敗とで処理を分ける
-    // // レスポンスデータの末尾が16進数で '90 00' の場合が成功
-    // let res_len = res_apdu.len();
-    // let result_code = &res_apdu[res_len - 2..res_len];
-    // if !(*result_code.get(0).unwrap() == 0x90 && *result_code.get(1).unwrap() == 0x00) {
-    //     println!("> IDmの読み出しに失敗");
-    // } else {
-    //     println!("> IDm成功");
-    //     println!("長さ: res_len");
-    //     println!("result_code: {} - {}", res_len - 2, res_len);
-    //     println!("生データ\n{:?}", res_apdu);
-    //     println!("16進数データ\n{:02X?}", res_apdu);
-    // }
-
-    // カードからIDmを吸い出す
     let mut idm = IDm::new();
     idm.get_idm(card);
     println!("{:?}", idm.resp_idm());
