@@ -102,8 +102,10 @@ fn main() {
 
     // カードからIDmを吸い出す
     let mut idm = IDm::new();
-    idm.get_idm(card);
+    idm.get_idm(&card);
     println!("{:?}", idm.resp_idm());
+
+    idm.icoca_bal(&card);
 
     // TODO: ダンプさせる
 

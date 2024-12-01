@@ -28,8 +28,8 @@ impl IDm {
     }
 
     // カードからIDmを取得する
-    pub fn get_idm(&mut self, card: pcsc::Card) {
-        let idm_cmd = hex!("FF CA 00 00"); // どういったカードなのかを知るコマンド
+    pub fn get_idm(&mut self, card: &pcsc::Card) {
+        let idm_cmd = hex!("FF CA 00 00 00"); // どういったカードなのかを知るコマンド
         let mut buf = [0; MAX_BUFFER_SIZE];
         match card.transmit(&idm_cmd, &mut buf) {
             Ok(res_apdu) => {
@@ -51,21 +51,37 @@ impl IDm {
         }
     }
 
-    pub fn dump_card(&mut self, card: pcsc::Card) {
-        let mut cmd_dump: Vec<u8> = vec![0x06];
+    // 試しにicocaの残高を読み取ってみる
+    pub fn icoca_bal(&mut self, card: &pcsc::Card) {
+        // ICOCA属性情報のサービスコードは0x008B
+        // http://jennychan.web.fc2.com/format/suica.html
+        let mut buf = [0; MAX_BUFFER_SIZE];
+        let select_file_cmd = hex!("FF A4 00 01 02 8B 00"); // サービスコードはリトルエディアンで指定
+        let read_binary_cmd = hex!("FF B0 00 00 00");
 
-        let vidm = if let Ok(i) = &self.idm {
-            i
-        } else {
-            eprintln!("idmがありません");
-            std::process::exit(1);
+        let r = match card.transmit(&select_file_cmd, &mut buf) {
+            Ok(responce) => responce,
+            Err(err) => {
+                eprintln!("APDUコマンドの送信に失敗: {}", err);
+                std::process::exit(1);
+            }
         };
-        cmd_dump.append(&mut vidm.clone());
+        println!("select file cmd: {:02X?}", r);
 
-        let vec_endcode = vec![0x01, 0xCB, 0x09, 0x01, 0x00];
-        cmd_dump.append(&mut vec_endcode.clone());
+        let r = match card.transmit(&read_binary_cmd, &mut buf) {
+            Ok(responce) => responce,
+            Err(err) => {
+                eprintln!("APDUコマンドの送信に失敗: {}", err);
+                std::process::exit(1);
+            }
+        };
 
-        // select file apdu commandから
+        println!("read binary: {:02X?}", r);
+
+        // 残高表示
+        // 10進数へ変換
+        let comb = ((r[12] as u16) << 8) | (r[11] as u16);
+        println!("💰残高: {} 円", comb);
     }
 
     // IDmを個別で返す
