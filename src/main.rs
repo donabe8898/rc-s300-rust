@@ -105,7 +105,7 @@ fn main() {
     idm.get_idm(&card);
     println!("{:?}", idm.resp_idm());
 
-    idm.icoca_bal(&card);
+    idm.print_bal(&card);
 
     // TODO: ダンプさせる
 
